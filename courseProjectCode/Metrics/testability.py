@@ -23,7 +23,7 @@ def main():
 
     # run tests with counter and cov
     pytest.main([
-        ".", # path
+        "pandas/tests",
     ], plugins=[counter])
 
     cov.stop()

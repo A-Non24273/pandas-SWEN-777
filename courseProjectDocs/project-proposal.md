@@ -14,15 +14,19 @@ To assess the quality of pandas we used the initial metrics outlined in the "Met
     - The amount of documentation and comment lines relative to the total lines (code plus comments) in each individual file.
 - Total Lines of Code
     - The sum of all of the lines of code (LOC) in the entire core system.
+    - We calculated the total LOC in the pandas/core directory to be 160,033.
 - Total Comment Density
     - The ratio of documentation lines to total lines in the entire core system.
+    - We calculated the total comment density in the pandas/core directory to be 55%.
 
 ## Testability Metrics
 In addition to maintainability tests we looked at the testability of the pandas codebase. These tests look at how thoroughly the software can be validated for it's correctness. The metrics we tracked are:
 - Number of Unit Test Cases
     - The total quantity of distinct test items collected across the test quite.
+    - We calculated 49,203 unit tests for the pandas/core directory.
 - Test Coverage
     - The percentage of executable Python code ran and verified during test execution.
+    - We calculated the pandas/core directory to have 93% code coverage overall.
 
 ## Additional Semester Quality Metrics
 In addition to the baseline measurements our team looks to implement a few more tests for quality metrics. These metrics are:
