@@ -21,14 +21,6 @@
 ...
 
 ## Test Oracles
-
-| Requirement ID | Requirement Description | Test Oracle (Expected Behavior) |
-|-----------------------|-----------------------------------|---------------------------------------------|
-| FR-1                   | The system shall ………..| After adding "Buy milk"................|
-| FR-2                   | The system shal…. ……..| After deleting `"Buy milk".............|
-| NFR-1                | The system shall………... | When…………..within 1 second. |
-| FR-4                   | ……..                                |............                                         |
-
 | Requirement ID | Requirement Description                                                                                       | Test Oracle (Expected Behavior)                                                                                                                                                                                |
 | -------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | FR-1           | The system shall support reading from a JSON file                                                             | After providing a valid JSON file containing tabular data, pandas shall successfully create a pandas object containing the corresponding data without raising an exception.                                    |
