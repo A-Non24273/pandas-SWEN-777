@@ -1,7 +1,7 @@
 """
 This file is used to calculate the maintainability of the pandas core code. It calculates:
 - Lines of Code per file
-- Comment density per file
+- Comment Density per file
 - Total Lines of Code
 - Total Comment Density
 
