@@ -4,8 +4,6 @@ This file is used to calculate the maintainability of the pandas core code. It c
 - Comment Density per file
 - Total Lines of Code
 - Total Comment Density
-
-Run calculations by running the main function of this file.
 """
 
 import os
