@@ -4,7 +4,7 @@
 
 The new file
 [`pandas/tests/core/test_course_project_edge_cases.py`](../../pandas/tests/core/test_course_project_edge_cases.py)
-contains 15 deterministic edge-case tests:
+contains 20 deterministic edge-case tests:
 
 | Test area | Cases and rationale |
 | --- | --- |
@@ -31,22 +31,22 @@ miss when testing only successful, non-empty, uniquely indexed inputs.
 The command in the README was run against the local checkout:
 
 ```text
-15 passed in 1.16s
+20 passed in 1.13s
 ```
 
 | Tests run | Passed | Failed |
 | ---: | ---: | ---: |
-| 15 | 15 | 0 |
+| 20 | 20 | 0 |
 
-The existing baseline reports 49,203 passing tests. Including these 15 added
-tests, the suite represents 49,218 passing tests when run together with the
+The existing baseline reports 49,203 passing tests. Including these 20 added
+tests, the suite represents 49,223 passing tests when run together with the
 baseline suite.
 
 ## Coverage improvement analysis
 
 The baseline in `courseProjectDocs/Setup/report.md` reports 93% coverage for
 the complete `pandas/core` suite, with 49,203 tests. The focused command for
-the new module measured execution from only those 7 tests and reported:
+the new module measured execution from only those 17 tests and reported:
 
 ```text
 TOTAL: 49,203 statements, 35,837 missed, 20,664 branches,
@@ -56,7 +56,7 @@ TOTAL: 49,203 statements, 35,837 missed, 20,664 branches,
 The focused 21% value must not be presented as a replacement for the
 baseline 93%: it measures the entire `pandas/core` source while running only
 the new test file, whereas the baseline measures the complete test suite.
-The new tests add 7 passing cases and specifically execute error-handling
+The new tests add 17 passing cases and specifically execute error-handling
 and boundary branches in core indexing, construction, missing-data, and
 reshape logic. A full-suite coverage run is required to produce a new
 aggregate percentage that is directly comparable with the 93% baseline.

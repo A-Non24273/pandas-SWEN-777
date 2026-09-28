@@ -124,3 +124,54 @@ def test_compare_arr_2d():
 def test_int_as_api_extension():
     with pytest.raises(ValueError, match="can only register pandas extension dtypes"):
         pd.api.extensions.register_extension_dtype(int)
+
+def test_dropna_thresh_counts_non_missing_values_per_row():
+    frame = pd.DataFrame({"left": [1, np.nan], "right": [np.nan, 2]})
+
+    result = frame.dropna(thresh=2)
+
+    expected = pd.DataFrame(columns=["left", "right"]).astype("float64")
+    tm.assert_frame_equal(result, expected)
+
+
+def test_fillna_limit_only_fills_the_first_missing_values():
+    series = pd.Series([np.nan, np.nan, 3.0])
+
+    result = series.fillna(0, limit=1)
+
+    expected = pd.Series([0.0, np.nan, 3.0])
+    tm.assert_series_equal(result, expected)
+
+
+def test_concat_empty_frame_keeps_columns_and_dtype():
+    empty = pd.DataFrame({"value": pd.Series(dtype="int64")})
+    populated = pd.DataFrame({"value": [1, 2]}, dtype="int64")
+
+    result = pd.concat([empty, populated], ignore_index=True)
+
+    expected = pd.DataFrame({"value": [1, 2]}, dtype="int64")
+    tm.assert_frame_equal(result, expected)
+
+
+def test_melt_can_preserve_original_index():
+    frame = pd.DataFrame({"first": [1, 2], "second": [3, 4]}, index=["x", "y"])
+
+    result = frame.melt(ignore_index=False)
+
+    expected = pd.DataFrame(
+        {
+            "variable": ["first", "first", "second", "second"],
+            "value": [1, 2, 3, 4],
+        },
+        index=["x", "y", "x", "y"],
+    )
+    tm.assert_frame_equal(result, expected)
+
+
+def test_pivot_rejects_duplicate_index_column_combinations():
+    frame = pd.DataFrame(
+        {"row": ["a", "a"], "column": ["x", "x"], "value": [1, 2]}
+    )
+
+    with pytest.raises(ValueError, match="Index contains duplicate entries"):
+        frame.pivot(index="row", columns="column", values="value")
