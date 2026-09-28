@@ -4,7 +4,7 @@
 
 The new file
 [`pandas/tests/core/test_course_project_edge_cases.py`](../../pandas/tests/core/test_course_project_edge_cases.py)
-contains 7 deterministic edge-case tests:
+contains 15 deterministic edge-case tests:
 
 | Test area | Cases and rationale |
 | --- | --- |
@@ -15,6 +15,13 @@ contains 7 deterministic edge-case tests:
 | Missing data | `dropna(thresh=...)` counts non-missing values per row, and `fillna(limit=...)` stops after the configured number of values. |
 | Concatenation | Concatenating an empty typed frame with populated data preserves the column dtype. |
 | Reshaping | `melt(ignore_index=False)` preserves the source index, while `pivot` rejects duplicate index/column combinations. |
+| Grouping | Grouping with args empty causes error. Grouping with as_index causes error. |
+| Inserting | Inserting into a DataFrame with an index that is not an int causes an error. |
+| RangeIndex | Calling RangeIndex with a step of 0 causes an error. |
+| Sorting MultiIndex | Sorting a MultiIndex using args of different length cause an error. |
+| Comparing | Comparing two pd.arrays with different lengths causes an error. Comparing a 1-dimensional array with a 2-dimensional array causes an error. |
+| API Extension | Registering int as an api extension causes an error. |
+
 
 These cases exercise boundary conditions and error paths that are easy to
 miss when testing only successful, non-empty, uniquely indexed inputs.
@@ -24,15 +31,15 @@ miss when testing only successful, non-empty, uniquely indexed inputs.
 The command in the README was run against the local checkout:
 
 ```text
-7 passed in 5.83s
+15 passed in 1.16s
 ```
 
 | Tests run | Passed | Failed |
 | ---: | ---: | ---: |
-| 7 | 7 | 0 |
+| 15 | 15 | 0 |
 
-The existing baseline reports 49,203 passing tests. Including these 7 added
-tests, the suite represents 49,210 passing tests when run together with the
+The existing baseline reports 49,203 passing tests. Including these 15 added
+tests, the suite represents 49,218 passing tests when run together with the
 baseline suite.
 
 ## Coverage improvement analysis
