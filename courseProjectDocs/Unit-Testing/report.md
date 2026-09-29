@@ -46,17 +46,19 @@ baseline suite.
 
 The baseline in `courseProjectDocs/Setup/report.md` reports 93% coverage for
 the complete `pandas/core` suite, with 49,203 tests. The focused command for
-the new module measured execution from only those 17 tests and reported:
+the new module measured execution from only those 20 tests and reported:
 
 ```text
-TOTAL: 49,203 statements, 35,837 missed, 20,664 branches,
-       1,591 partial/missed branches, 21% line coverage
+TOTAL: 49,203 statements, 35,796 missed, 20,664 branches,
+       1,601 partial branches, 21% line coverage
 ```
 
 The focused 21% value must not be presented as a replacement for the
 baseline 93%: it measures the entire `pandas/core` source while running only
 the new test file, whereas the baseline measures the complete test suite.
-The new tests add 17 passing cases and specifically execute error-handling
-and boundary branches in core indexing, construction, missing-data, and
-reshape logic. A full-suite coverage run is required to produce a new
-aggregate percentage that is directly comparable with the 93% baseline.
+The new tests add 20 passing cases and specifically execute error-handling
+and boundary branches in core indexing, construction, grouping, insertion,
+range and multi-index handling, comparisons, missing-data, concatenation,
+reshaping, and API extension registration. A full-suite coverage run is
+required to produce a new aggregate percentage that is directly comparable
+with the 93% baseline.
