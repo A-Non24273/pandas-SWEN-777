@@ -36,3 +36,40 @@ PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest \
   --cov=pandas/core --cov-report=term-missing
 ```
 
+## Mock-based metrics tests
+
+The metrics tests are in
+[`courseProjectCode/Metrics/test_metrics.py`](../../courseProjectCode/Metrics/test_metrics.py).
+They stub pytest collection, the coverage API, and source-analysis/file
+traversal so the results do not depend on running the full pandas test suite or
+reading the checkout's source files.
+
+From the repository root, create a virtual environment and install the course
+project dependencies (skip these steps if they are already installed in your
+environment):
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r courseProjectCode/requirements.txt
+```
+
+Run the tests with:
+
+```bash
+.venv/bin/python -m pytest courseProjectCode/Metrics/test_metrics.py
+```
+
+To reproduce the focused coverage measurement for the two metrics scripts:
+
+```bash
+.venv/bin/python -m coverage run \
+  --source=courseProjectCode.Metrics \
+  --omit='*/test_metrics.py' \
+  -m pytest courseProjectCode/Metrics/test_metrics.py
+.venv/bin/python -m coverage report -m \
+  --omit='*/test_metrics.py'
+```
+
+The design rationale and coverage interpretation are in
+[`mocking.md`](mocking.md).
+
