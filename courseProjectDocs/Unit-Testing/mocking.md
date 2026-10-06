@@ -2,43 +2,47 @@
 
 ## New test cases and rationale
 
-[`courseProjectCode/Metrics/test_metrics.py`](../../courseProjectCode/Metrics/test_metrics.py)
-contains three tests for the custom metrics scripts:
+[`pandas/tests/core/test_course_project_mocks.py`](../../pandas/tests/core/test_course_project_mocks.py)
+contains five tests that isolate external collaborators used by pandas core:
 
 | Test | Rationale |
 | --- | --- |
-| Collection hook counts collected items | Checks the test-count plugin's state update without asking pytest to collect the pandas suite. |
-| Testability main coordinates pytest and coverage | Verifies source selection, execution order, and printed test count while avoiding a nested full-suite run and real coverage-data writes. |
-| Maintainability main aggregates source analysis | Checks per-file and total LOC/comment-density output, plus the unreadable-file skip path, without reading real source files. |
+| `DataFrame.to_markdown` delegates formatting | Replaces optional `tabulate` import and verifies pandas supplies its documented defaults and returns the formatter result. |
+| `DataFrame.to_markdown` writes through its handle | Replaces `get_handle` and the output handle, checking path/mode/storage options and ensuring formatted text is written without touching disk. |
+| Expression evaluation dispatches to NumExpr | Replaces the NumExpr evaluator and verifies the expression, operands, and safe-casting option forwarded by pandas. |
+| `NDFrame.to_json` delegates serialization | Replaces the JSON writer and checks that the object and selected serialization options are forwarded and its result returned. |
+| `DataFrame.to_parquet` delegates storage | Replaces the Parquet writer and checks engine, compression, index, and other storage options without requiring an installed Parquet engine or writing a file. |
 
 ## Mocking strategy
 
-Use pytest's `monkeypatch` fixture to replace boundaries at the point each
-script consumes them. `pytest.main` is a stub that invokes the supplied
-collection plugin with two fake items. `coverage.Coverage` is replaced by a
-small recording fake so the test can assert that coverage starts before the
-runner and stops, saves, and reports afterward. For maintainability,
-`os.walk` yields a fixed set of paths and `SourceAnalysis.from_file` returns
-fixed code/documentation counts or raises `OSError` for one path.
+Use pytest's `monkeypatch` fixture at the point each dependency is consumed.
+The formatter test replaces `pandas.core.frame.import_optional_dependency`
+with a lightweight object exposing a mock `tabulate` method. The output test
+also replaces `pandas.core.frame.get_handle` with a mock context manager whose
+handle records writes. The expression test directs `evaluate` through
+`_evaluate_numexpr`, forces its eligibility check to pass, and supplies a mock
+`ne.evaluate`; this isolates dispatch from NumExpr's implementation and
+avoids depending on array-size thresholds or compiled backend behavior.
+The JSON and Parquet tests replace `pandas.io.json.to_json` and
+`pandas.io.parquet.to_parquet` respectively, validating the wrapper arguments
+without invoking their serialization backends.
 
-These are stubs rather than behaviorally complete substitutes: they return
-only the values needed to exercise the scripts' own decisions. This keeps the
-tests deterministic, fast, independent of pandas' test suite, and independent
-of the checkout's filesystem contents.
+Each mock preserves the relevant collaborator contract while controlling its
+result. Assertions focus on pandas' responsibility: defaults and return
+values, output routing, and backend call arguments.
 
 ## Coverage improvement analysis
 
-The new tests directly execute the metrics scripts' orchestration, report
-aggregation, percentage calculations, and exception-skip behavior. The
-coverage command in [`README.md`](README.md) measures only
-`testability.py` and `maintainability.py`; its result must not be compared to
-the separate pandas-core coverage numbers, which measure a different source
-tree and test scope.
-
-Focused result: **3 tests passed**. Coverage measured 38 statements with 0
-missed, 4 branches with 0 partial branches, for **100% coverage** across the
-two metrics scripts. This confirms the relevant script lines and branches are
-exercised by the mocked tests. No previous focused baseline exists for these
-scripts, so a percentage-point increase cannot be claimed; the result is also
-not comparable with pandas-core coverage. The measured result is repeated in
-[`report.md`](report.md).
+The tests exercise the pandas-core caller paths for Markdown formatting,
+output handling, expression backend dispatch, JSON serialization delegation,
+and Parquet serialization delegation. The focused coverage command in
+[`README.md`](README.md) scopes measurement to `pandas.core.frame`,
+`pandas.core.generic`, and `pandas.core.computation.expressions`, rather than
+measuring every module under `pandas/core`. The resulting percentages are
+test-file-specific and should not be compared directly with the full-suite
+93% baseline or the edge-case-only 21% measurement above. Coverage could not yet be measured
+because pytest fails during pandas import when the local compiled extensions
+are unavailable, and editable installation stalls during metadata preparation
+in this untagged checkout. The build and test status are tracked in
+[`report.md`](report.md); no numeric coverage increase is claimed before that
+focused run succeeds.

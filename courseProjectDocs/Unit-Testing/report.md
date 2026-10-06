@@ -63,37 +63,31 @@ reshaping, and API extension registration. A full-suite coverage run is
 required to produce a new aggregate percentage that is directly comparable
 with the 93% baseline.
 
-## Mock-based metrics tests
+## Mock-based pandas core tests
 
-[`courseProjectCode/Metrics/test_metrics.py`](../../courseProjectCode/Metrics/test_metrics.py)
-adds three tests covering the test-count hook, testability/coverage
-orchestration, and maintainability aggregation. The tests replace pytest,
-coverage, filesystem traversal, and source analysis with deterministic stubs.
+[`pandas/tests/core/test_course_project_mocks.py`](../../pandas/tests/core/test_course_project_mocks.py)
+adds five tests for `DataFrame.to_markdown`'s formatter and output handling,
+NumExpr backend dispatch in pandas expressions, and JSON and Parquet writer
+delegation. The formatter, handle API, and backends are replaced with mocks so
+these tests check pandas' call contracts without relying on optional formatter
+installation, filesystem writes, or actual backend execution.
 
-The focused test command, dependency setup, and mock rationale are documented
-in [`README.md`](README.md) and [`mocking.md`](mocking.md).
-
-The coverage command reports only `testability.py` and `maintainability.py`.
-This focused metric for the custom course scripts is not directly comparable
-with either the 93% full-suite pandas-core baseline or the 21% pandas-core
-edge-case run. Test execution and the measured focused percentage are recorded
-below.
+Run instructions and the focused coverage command are in
+[`README.md`](README.md). Coverage is scoped to `pandas.core.frame` and
+`pandas.core.computation.expressions`, not the entire `pandas/core` tree; the
+measured result is recorded below after validation.
 
 ### Mock-test results and coverage
 
-The documented focused test command completed successfully:
+The test module now covers five mocked pandas-core behaviors: Markdown
+formatting, output-handle writing, NumExpr expression dispatch, JSON writer
+delegation, and Parquet writer delegation. The documented coverage command
+scopes measurement to the three core modules containing those call paths.
 
-```text
-3 passed in 0.18s
-```
-
-The documented coverage command reported:
-
-```text
-TOTAL  38 statements, 0 missed, 4 branches, 0 partial branches, 100% coverage
-```
-
-Both metrics scripts were fully covered by this focused run. There is no
-previous coverage baseline for these two scripts, so 100% is the resulting
-focused coverage, not a quantified percentage-point increase. The pandas-core
-figures above use a different codebase scope and are not comparable.
+**Execution and coverage status:** not measured. Pytest fails during pandas
+import because the checkout has no compiled extensions. The documented
+editable build stalls during metadata preparation; this checkout has no git
+tags, which its setup guide identifies as a possible build issue. After
+resolving the local build prerequisite, run the README commands and replace
+this status with the focused test count and per-module coverage results. No
+numeric coverage improvement is claimed before that run succeeds.

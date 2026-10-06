@@ -36,40 +36,31 @@ PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest \
   --cov=pandas/core --cov-report=term-missing
 ```
 
-## Mock-based metrics tests
+## Mock-based pandas core tests
 
-The metrics tests are in
-[`courseProjectCode/Metrics/test_metrics.py`](../../courseProjectCode/Metrics/test_metrics.py).
-They stub pytest collection, the coverage API, and source-analysis/file
-traversal so the results do not depend on running the full pandas test suite or
-reading the checkout's source files.
+The added core tests are in
+[`pandas/tests/core/test_course_project_mocks.py`](../../pandas/tests/core/test_course_project_mocks.py).
+They mock the optional `tabulate` formatter, pandas' `get_handle` output
+boundary, the NumExpr evaluator, and the JSON and Parquet writer APIs.
 
-From the repository root, create a virtual environment and install the course
-project dependencies (skip these steps if they are already installed in your
-environment):
+Run the tests from the repository root in the configured pandas development
+environment:
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install -r courseProjectCode/requirements.txt
+PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest \
+  pandas/tests/core/test_course_project_mocks.py
 ```
 
-Run the tests with:
+To measure coverage only for the core modules exercised by these tests:
 
 ```bash
-.venv/bin/python -m pytest courseProjectCode/Metrics/test_metrics.py
+PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest \
+  pandas/tests/core/test_course_project_mocks.py \
+  --cov=pandas.core.frame --cov=pandas.core.generic \
+  --cov=pandas.core.computation.expressions \
+  --cov-report=term-missing
 ```
 
-To reproduce the focused coverage measurement for the two metrics scripts:
-
-```bash
-.venv/bin/python -m coverage run \
-  --source=courseProjectCode.Metrics \
-  --omit='*/test_metrics.py' \
-  -m pytest courseProjectCode/Metrics/test_metrics.py
-.venv/bin/python -m coverage report -m \
-  --omit='*/test_metrics.py'
-```
-
-The design rationale and coverage interpretation are in
+The test rationale, mock boundaries, and coverage interpretation are in
 [`mocking.md`](mocking.md).
 
