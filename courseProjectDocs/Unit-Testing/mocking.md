@@ -3,46 +3,54 @@
 ## New test cases and rationale
 
 [`pandas/tests/core/test_course_project_mocks.py`](../../pandas/tests/core/test_course_project_mocks.py)
-contains five tests that isolate external collaborators used by pandas core:
+contains five focused tests. Each uses a stub at a collaborator boundary while
+asserting behavior implemented by pandas:
 
 | Test | Rationale |
 | --- | --- |
-| `DataFrame.to_markdown` delegates formatting | Replaces optional `tabulate` import and verifies pandas supplies its documented defaults and returns the formatter result. |
-| `DataFrame.to_markdown` writes through its handle | Replaces `get_handle` and the output handle, checking path/mode/storage options and ensuring formatted text is written without touching disk. |
-| Expression evaluation dispatches to NumExpr | Replaces the NumExpr evaluator and verifies the expression, operands, and safe-casting option forwarded by pandas. |
-| `NDFrame.to_json` delegates serialization | Replaces the JSON writer and checks that the object and selected serialization options are forwarded and its result returned. |
-| `DataFrame.to_parquet` delegates storage | Replaces the Parquet writer and checks engine, compression, index, and other storage options without requiring an installed Parquet engine or writing a file. |
+| `test_to_markdown_formats_frame_with_stubbed_tabulate` | Verifies `DataFrame.to_markdown` passes the actual frame and its default options to the formatter, then returns its formatted result. |
+| `test_to_markdown_writes_to_stubbed_handle` | Verifies pandas sends the formatted content through its handle API, forwarding the path and storage options and returning `None`. |
+| `test_expression_evaluates_with_stubbed_numexpr` | Verifies pandas constructs the NumExpr expression with the correct operands and safe-casting option; the stub performs the addition and the result is checked. |
+| `test_to_json_uses_pandas_split_payload_with_stubbed_encoder` | Verifies pandas constructs split-orient JSON data without the index and passes the requested encoding options to the encoder. |
+| `test_to_parquet_normalizes_partition_columns_with_stubbed_engine` | Verifies pandas normalizes a string partition column to a list and returns bytes written by the engine to its buffer. |
 
 ## Mocking strategy
 
-Use pytest's `monkeypatch` fixture at the point each dependency is consumed.
-The formatter test replaces `pandas.core.frame.import_optional_dependency`
-with a lightweight object exposing a mock `tabulate` method. The output test
-also replaces `pandas.core.frame.get_handle` with a mock context manager whose
-handle records writes. The expression test directs `evaluate` through
-`_evaluate_numexpr`, forces its eligibility check to pass, and supplies a mock
-`ne.evaluate`; this isolates dispatch from NumExpr's implementation and
-avoids depending on array-size thresholds or compiled backend behavior.
-The JSON and Parquet tests replace `pandas.io.json.to_json` and
-`pandas.io.parquet.to_parquet` respectively, validating the wrapper arguments
-without invoking their serialization backends.
+The tests use pytest's `monkeypatch` fixture and small functional stubs instead
+of replacing pandas' public methods or asserting that a mock call happened.
+The Markdown tests replace the optional `tabulate` import with a formatter
+that consumes the real DataFrame values. The output-routing test also replaces
+`get_handle` with a context-manager stub backed by a real `StringIO` buffer.
 
-Each mock preserves the relevant collaborator contract while controlling its
-result. Assertions focus on pandas' responsibility: defaults and return
-values, output routing, and backend call arguments.
+The expression test directs pandas through its NumExpr implementation and
+stubs only `ne.evaluate`; the stub computes from the supplied operands so the
+test checks the result as well as expression construction. The JSON test stubs
+the low-level `ujson_dumps` encoder, allowing assertions on the structure
+prepared by pandas' `FrameWriter`. The Parquet test stubs the selected engine;
+its writer writes to the real in-memory buffer created by pandas, exercising
+partition normalization and the bytes-return path without an optional parquet
+dependency.
 
 ## Coverage improvement analysis
 
-The tests exercise the pandas-core caller paths for Markdown formatting,
-output handling, expression backend dispatch, JSON serialization delegation,
-and Parquet serialization delegation. The focused coverage command in
-[`README.md`](README.md) scopes measurement to `pandas.core.frame`,
-`pandas.core.generic`, and `pandas.core.computation.expressions`, rather than
-measuring every module under `pandas/core`. The resulting percentages are
-test-file-specific and should not be compared directly with the full-suite
-93% baseline or the edge-case-only 21% measurement above. Coverage could not yet be measured
-because pytest fails during pandas import when the local compiled extensions
-are unavailable, and editable installation stalls during metadata preparation
-in this untagged checkout. The build and test status are tracked in
-[`report.md`](report.md); no numeric coverage increase is claimed before that
-focused run succeeds.
+Reproduce the focused run with the coverage commands in
+[`README.md`](README.md). The measured results were:
+
+```text
+5 passed
+Name                                     Stmts   Miss   Cover
+pandas/core/computation/expressions.py     109     56     49%
+pandas/core/frame.py                      2528   2176     14%
+pandas/core/generic.py                    1984   1528     23%
+pandas/io/json/_json.py                    577    434     25%
+pandas/io/parquet.py                       188    143     24%
+TOTAL                                     5386   4337     19%
+```
+
+These percentages are for entire source modules measured while running only
+the five new tests; they are not the full-suite coverage rate. The tests
+exercise the relevant pandas behavior in each module (Markdown defaults and
+output, expression dispatch, JSON payload preparation, and Parquet buffer and
+partition handling). The focused percentages therefore show which modules
+receive execution, but should not be interpreted as the coverage of those
+individual methods or as a direct comparison with full-suite coverage.
