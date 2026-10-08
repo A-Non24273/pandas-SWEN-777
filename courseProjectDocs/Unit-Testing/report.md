@@ -38,27 +38,28 @@ The command in the README was run against the local checkout:
 | ---: | ---: | ---: |
 | 20 | 20 | 0 |
 
-The existing baseline reports 49,203 passing tests. Including these 20 added
-tests, the suite represents 49,223 passing tests when run together with the
-baseline suite.
+These tests are included in the full-suite run described below.
 
 ## Coverage improvement analysis
 
-The baseline in `courseProjectDocs/Setup/report.md` reports 93% coverage for
-the complete `pandas/core` suite, with 49,203 tests. The focused command for
-the new module measured execution from only those 20 tests and reported:
+The full `pandas/tests` suite was run with coverage scoped to `pandas/core`.
+The command excluded network-marked tests, the clipboard tests (which require
+the unavailable `qapp` fixture), and the XML test module with URL-dependent
+cases:
 
 ```text
-TOTAL: 49,203 statements, 35,796 missed, 20,664 branches,
-       1,601 partial branches, 21% line coverage
+178876 passed, 29333 skipped, 127 deselected, 666 xfailed
 ```
 
-The focused 21% value must not be presented as a replacement for the
-baseline 93%: it measures the entire `pandas/core` source while running only
-the new test file, whereas the baseline measures the complete test suite.
-The new tests add 20 passing cases and specifically execute error-handling
-and boundary branches in core indexing, construction, grouping, insertion,
-range and multi-index handling, comparisons, missing-data, concatenation,
-reshaping, and API extension registration. A full-suite coverage run is
-required to produce a new aggregate percentage that is directly comparable
-with the 93% baseline.
+The coverage report for `pandas/core` was:
+
+```text
+TOTAL: 49,203 statements, 6,516 missed, 20,664 branches,
+       1,728 partial branches, 85% branch-aware coverage
+```
+
+The 20 new edge-case tests contribute additional coverage for boundary and
+error paths in core indexing, construction, grouping, insertion, range and
+multi-index handling, comparisons, missing-data, concatenation, reshaping,
+and API extension registration. Reproduce the full-suite run with the command
+in [`README.md`](README.md).
