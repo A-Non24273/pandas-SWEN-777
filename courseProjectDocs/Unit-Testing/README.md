@@ -36,3 +36,46 @@ PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest \
   --cov=pandas/core --cov-report=term-missing
 ```
 
+## Full-suite core coverage
+
+To run the full pandas test suite and measure coverage for `pandas/core`, use:
+
+```bash
+PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest pandas/tests -q \
+  --cov=pandas/core --cov-report=term
+```
+
+## Mock-based pandas core tests
+
+The added core tests are in
+[`pandas/tests/core/test_course_project_mocks.py`](../../pandas/tests/core/test_course_project_mocks.py).
+They stub the optional Markdown formatter, pandas' handle API, NumExpr
+evaluation, the low-level JSON encoder, and the Parquet engine. The assertions
+check pandas' inputs and transformations at each boundary, along with returned
+or written output.
+
+Run the tests from the repository root in the configured pandas development
+environment (the local build prerequisites are listed above):
+
+```bash
+PATH="$PWD/.venv/bin:$PATH" .venv/bin/python -m pytest \
+  -q pandas/tests/core/test_course_project_mocks.py
+```
+
+The expected result is `5 passed`. To reproduce the focused coverage report,
+run coverage and report only the pandas implementation modules used by the
+tests:
+
+```bash
+COVERAGE_RCFILE=/dev/null PATH="$PWD/.venv/bin:$PATH" \
+  .venv/bin/python -m coverage run \
+  --include='*/pandas/core/frame.py,*/pandas/core/generic.py,*/pandas/core/computation/expressions.py,*/pandas/io/json/_json.py,*/pandas/io/parquet.py' \
+  -m pytest -q pandas/tests/core/test_course_project_mocks.py
+COVERAGE_RCFILE=/dev/null PATH="$PWD/.venv/bin:$PATH" \
+  .venv/bin/python -m coverage report \
+  --include='*/pandas/core/frame.py,*/pandas/core/generic.py,*/pandas/core/computation/expressions.py,*/pandas/io/json/_json.py,*/pandas/io/parquet.py' \
+  --show-missing
+```
+
+For the test rationale, mock boundaries, and coverage interpretation, see
+[`mocking.md`](mocking.md).
