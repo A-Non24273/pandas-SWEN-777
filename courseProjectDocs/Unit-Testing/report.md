@@ -48,7 +48,7 @@ the unavailable `qapp` fixture), and the XML test module with URL-dependent
 cases:
 
 ```text
-178876 passed, 29333 skipped, 127 deselected, 666 xfailed
+178876 passed, 29333 skipped, 127 deselected, 666 failed
 ```
 
 The coverage report for `pandas/core` was:
@@ -58,7 +58,7 @@ TOTAL: 49,203 statements, 6,516 missed, 20,664 branches,
        1,728 partial branches, 85% branch-aware coverage
 ```
 
-The 20 new edge-case tests contribute additional coverage for boundary and
+The 25 new edge-case and stubbing tests contribute additional coverage for boundary and
 error paths in core indexing, construction, grouping, insertion, range and
 multi-index handling, comparisons, missing-data, concatenation, reshaping,
 and API extension registration. Reproduce the full-suite run with the command

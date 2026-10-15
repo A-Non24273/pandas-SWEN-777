@@ -16,8 +16,7 @@ asserting behavior implemented by pandas:
 
 ## Mocking strategy
 
-The tests use pytest's `monkeypatch` fixture and small functional stubs instead
-of replacing pandas' public methods or asserting that a mock call happened.
+The tests use pytest's `monkeypatch` fixture and small functional stubs to test methods that rely on the stubbed functions.
 The Markdown tests replace the optional `tabulate` import with a formatter
 that consumes the real DataFrame values. The output-routing test also replaces
 `get_handle` with a context-manager stub backed by a real `StringIO` buffer.
@@ -47,10 +46,4 @@ pandas/io/parquet.py                       188    143     24%
 TOTAL                                     5386   4337     19%
 ```
 
-These percentages are for entire source modules measured while running only
-the five new tests; they are not the full-suite coverage rate. The tests
-exercise the relevant pandas behavior in each module (Markdown defaults and
-output, expression dispatch, JSON payload preparation, and Parquet buffer and
-partition handling). The focused percentages therefore show which modules
-receive execution, but should not be interpreted as the coverage of those
-individual methods or as a direct comparison with full-suite coverage.
+These coverage percentages are for the modules that we added tests for.
