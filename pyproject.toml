@@ -709,3 +709,23 @@ exclude_lines = [
 [tool.codespell]
 ignore-words-list = "blocs, coo, hist, nd, sav, ser, recuse, nin, timere, expec, expecs, indext, SME, NotIn, tructures, tru, indx, abd, ABD"
 ignore-regex = 'https://([\w/\.])+'
+
+[tool.mutmut]
+source_paths = [
+    "../pandas/core/computation/", 
+    "../pandas/core/reshape/", 
+    "../pandas/core/groupby/"
+]
+paths_to_mutate = [
+  "../pandas/core/computation/align.py", 
+  "../pandas/core/reshape/concat.py", 
+  "../pandas/core/groupby/categorical.py"
+]
+tests_dir = [
+  "../pandas/tests/computation/", 
+  "../pandas/tests/reshape/concat/", 
+  "../pandas/tests/groupby/"
+]
+runner = "python -m pytest pandas/tests/computation/test_categorical.py pandas/tests/reshape/concat/test_concat.py --ignore=pandas/tests/groupby/test_numba.py --ignore=pandas/tests/groupby/aggregate/test_numba.py --ignore=pandas/tests/groupby/transform/test_numba.py"
+debug = true
+mutate_only_covered_lines = false
