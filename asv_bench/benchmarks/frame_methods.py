@@ -876,8 +876,8 @@ class FindValidIndex:
 
 
 class Update:
-    def setup(self):
-        rng = np.random.default_rng()
+    def setup(self, seed:int = None):
+        rng = np.random.default_rng(seed)
         self.df = DataFrame(rng.uniform(size=(1_000_000, 10)))
 
         idx = rng.choice(range(1_000_000), size=1_000_000, replace=False)
