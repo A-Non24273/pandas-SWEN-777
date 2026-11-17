@@ -4314,7 +4314,7 @@ class DataFrame(NDFrame, OpsMixin):
 
         # take() does not accept boolean indexers
         if getattr(indexer, "dtype", None) == bool:
-            indexer = np.where(indexer)[0]  # type: ignore[arg-type, assignment]
+            indexer = np.nonzero(indexer)[0]  # type: ignore[arg-type, assignment]
 
         if isinstance(indexer, slice):
             return self._slice(indexer, axis=1)
