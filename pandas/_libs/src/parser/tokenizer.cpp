@@ -2408,7 +2408,7 @@ int64_t str_to_int64(const char *p_item, int64_t length, int *error,
   // fast path needs a known span.
   if (length > 0) {
     const std::string_view item{p_item, static_cast<size_t>(length)};
-    if (const auto parsed = swar_try_parse_int64(item, tsep)) {
+    if (const auto parsed = swar_try_parse_int64(item, tsep); parsed.has_value()) {
       *error = 0;
       return *parsed;
     }
