@@ -1,6 +1,8 @@
 from unittest import mock
 
 import pandas as pd
+import os
+
 
 
 def test_plot_dispatches_to_mocked_backend():
@@ -19,11 +21,43 @@ def test_plot_dispatches_to_mocked_backend():
 
 
 def test_to_clipboard_calls_mocked_clipboard_set():
-    # Test that to_clipboard sends text to the mocked clipboard
     frame = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
 
     with mock.patch("pandas.io.clipboard.clipboard_set") as clipboard_set:
         result = frame.to_clipboard(index=False)
 
     assert result is None
-    clipboard_set.assert_called_once_with("a\tb\n1\t3\n2\t4\n")
+#os.lineup makes the test platform independant
+    expected = (
+        f"a\tb{os.linesep}"
+        f"1\t3{os.linesep}"
+        f"2\t4{os.linesep}"
+    )
+
+    clipboard_set.assert_called_once_with(expected)
+
+
+def test_pipe_calls_mocked_function():
+    # Test that pipe forwards the DataFrame and arguments to the function
+    frame = pd.DataFrame({"a": [1, 2]})
+    func = mock.Mock(return_value="result")
+
+    result = frame.pipe(func, factor=2)
+
+    func.assert_called_once()
+    passed_frame = func.call_args.args[0]
+    pd.testing.assert_frame_equal(passed_frame, frame)
+    assert func.call_args.kwargs == {"factor": 2}
+    assert result == "result"
+
+
+def test_apply_calls_mocked_function_for_each_column():
+    # Test that apply calls the function with each column as a Series
+    frame = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
+    func = mock.Mock(return_value=0)
+
+    frame.apply(func)
+
+    assert func.call_count == 2
+    pd.testing.assert_series_equal(func.call_args_list[0].args[0], frame["a"])
+    pd.testing.assert_series_equal(func.call_args_list[1].args[0], frame["b"])
