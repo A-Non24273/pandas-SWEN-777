@@ -108,3 +108,31 @@ def test_read_csv_rejects_missing_value_in_integer_column():
 
     with pytest.raises(ValueError, match="Integer column has NA values"):
         pd.read_csv(StringIO(data), dtype={"units": "int64"})
+
+
+"""
+Test Suite 2
+"""
+
+
+# Revenue values are categorized into bins and aggregated by those bins,
+# covering the integration between cut and groupby.
+def test_cut_categories_feed_groupby():
+    revenue = pd.Series([10.0, 25.0, 40.0, 55.0, 70.0])
+    bands = pd.cut(revenue, bins=[0, 30, 60, 100], labels=["Low", "Medium", "High"])
+
+    result = pd.DataFrame({"band": bands, "revenue": revenue}).groupby(
+        "band", observed=True
+    )["revenue"].sum()
+
+    expected = pd.Series(
+        [35.0, 95.0, 70.0],
+        index=pd.CategoricalIndex(
+            ["Low", "Medium", "High"],
+            categories=["Low", "Medium", "High"],
+            name="band",
+            ordered=True,
+        ),
+        name="revenue",
+    )
+    tm.assert_series_equal(result, expected)
