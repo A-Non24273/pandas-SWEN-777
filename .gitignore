@@ -139,3 +139,5 @@ doc/source/savefig/
 /.pyodide-xbuildenv-*
 
 venv
+courseProjectDocs/performance/spike-out/spike_metrics.json
+courseProjectDocs/performance/stress-out/stress_metrics.json
